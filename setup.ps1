@@ -5,7 +5,7 @@ $filename="file.txt"
 $quickbrown
 for ($x=1; $x -le $lines; $x++) { 
     Add-Content -Value  '$quickbrown `n' -Path $Folder\$($filename)
-    Write-Progress -Activity "File Creation" -Status $quickbrown -PercentComplete (($x/$lines)*100)
+    Write-Progress -Activity "File Creation" -Status "addeding content" -PercentComplete (($x/$lines)*100)
 
 }
 
