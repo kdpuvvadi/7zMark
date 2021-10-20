@@ -13,6 +13,6 @@ for ($k=1; $k -le $fileCount; $k++) {
     
     Copy-Item $Folder\$($filename) -Destination $Folder\file$($k).txt
     Write-Progress -Activity "File copy" -Status "copying:" -PercentComplete (($k/$fileCount)*100)
-
-
 }
+
+if($?) { Write-Output "Setup Completed"} else { Write-Error -Message "Error" -ErrorId 1}
