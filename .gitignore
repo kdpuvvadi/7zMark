@@ -4,5 +4,6 @@
 temp
 *.zip
 *.7z
+*.tmp
 
 .vscode
