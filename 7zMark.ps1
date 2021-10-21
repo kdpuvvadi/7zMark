@@ -10,13 +10,14 @@ function startBenchMark {
     param (
         $timeDuration
     )
-
     $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) .\$($Folder)\ | Out-Default } | select-object -Expand TotalMinutes 
-    if(!$?) {Throw Write-Output "Something Wentwrong" ; exit}
     return $7ztime
 }
 
-$startBench = Read-Host -Prompt "Start Benchmark ?[y/n]"
+$getSize = (Get-ChildItem .\temp\ | Measure-Object -Property Length -Sum ).Sum / 1073741824
+$sizeofDir = $getSize.ToString("###.##")
+
+$startBench = Read-Host -Prompt "Size of dump is $($sizeofDir)Gb, Start Benchmark ?[y/n]"
 if ($startBench -match "[yY]") {startBenchMark($time); Write-Output "Time for completion $time "}
 
 $cleanup = Read-Host -Prompt "Delete setup files?[y/n]"
