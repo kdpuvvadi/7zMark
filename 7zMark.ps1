@@ -5,14 +5,19 @@ if( "7z","zip" -NotContains $type ) { Throw "$type is not valid method" }
 $Folder = "temp"
 $method = "-t$($type)"
 Write-Output "Starting"
-$7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) .\$($Folder)\ | Out-Default } 
 
-$duration =$7ztime | select-object -Expand TotalMinutes 
+function startBenchMark {
+    param (
+        $timeDuration
+    )
 
-if($?) {Write-Output "Completed"}
+    $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) .\$($Folder)\ | Out-Default } | select-object -Expand TotalMinutes 
+    if(!$?) {Throw Write-Output "Something Wentwrong" ; exit}
+    return $7ztime
+}
 
-Write-Output "Operation took $duration minutes"
-
+$startBench = Read-Host -Prompt "Start Benchmark ?[y/n]"
+if ($startBench -match "[yY]") {startBenchMark($time); Write-Output "Time for completion $time "}
 
 $cleanup = Read-Host -Prompt "Delete setup files?[y/n]"
 if ( $cleanup -match "[yY]" ) { 
