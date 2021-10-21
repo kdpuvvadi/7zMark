@@ -1,6 +1,7 @@
 param($type="7z",$setupclean)
 
 if( "7z","zip" -NotContains $type ) { Throw "$type is not valid method" }
+if( "y","Y","n","N" -notcontains $setupclean ) { Throw "$type is not valid input" }
 
 $Folder = "temp"
 $method = "-t$($type)"
@@ -20,8 +21,7 @@ $sizeofDir = $getSize.ToString("###.##")
 $startBench = Read-Host -Prompt "Size of dump is $($sizeofDir)Mib, Start Benchmark ?[y/n]"
 if ($startBench -match "[yY]") {startBenchMark($time); Write-Output "Time for completion $time "}
 
-$cleanup = Read-Host -Prompt "Delete setup files?[y/n]"
-if ( $cleanup -match "[yY]" ) { 
+if ( $setupclean -match "[yY]" ) { 
     Write-Output "Cleaning up"
     remove-item test.$($type) -Force -Confirm:$false
     remove-item ./temp/  -Force -Recurse -Confirm:$false
