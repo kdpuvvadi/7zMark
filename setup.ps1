@@ -1,6 +1,13 @@
 param([int32] $fileCount=1000, $lines=100)
 $Folder = "temp"
 
+# Check 7Zip installed or not
+$is7z = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "7-Zip*"}
+if($null -eq $is7z.VersionMajor ) {
+    Throw "7Zip is not installed on your PC"
+    exit 1
+}
+
 function createFolder {
     New-Item -ItemType Directory $Folder -Force | out-null
 }
