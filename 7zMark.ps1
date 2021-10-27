@@ -30,6 +30,10 @@ if(!$dumpExist) {
     setup
 }
 
+#Check 7z installion status
+. ./setup.ps1
+get7z
+
 $getSize = (Get-ChildItem .\temp\ | Measure-Object -Property Length -Sum ).Sum / 1048576
 $sizeofDir = $getSize.ToString("###.##")
 
