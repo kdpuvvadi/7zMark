@@ -1,7 +1,7 @@
 param(
         $type="7z",
         $setupclean="n",
-        $fileCount=50000, 
+        $fileCount=20000, 
         $lines=100000
     )
 
