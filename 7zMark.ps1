@@ -42,16 +42,20 @@ function createdump {
 }
 
 function startBenchMark {
-    $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) .\$($Folder) | Out-Default } | select-object -Expand TotalMinutes 
-    Write-Output "Time for completion $($7ztime.ToString("###.####")) Minutes"
+    $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) .\$($Folder) | Out-Default } | select-object -Expand TotalSeconds 
+    Write-Output "Time for completion $($7ztime.ToString("####")) Seconds"
 }
 
 function setup {
-    $dumpStart = Read-Host -Prompt "Test Dump is not present. Press Y/y to create?[y/n]"
+    $dumpStart = Read-Host -Prompt "Test data is not present. Create?[y/n]"
     if ($dumpStart -match "[yY]") {
-        # $NoLines = Read-Host -Prompt "Select Number of lines:"
-        # $NoFiles = Read-Host -Prompt "Enter number of files:"
-        Invoke-Expression "./setup.ps1 -fileCount $fileCount -lines $lines"
+        createFolder
+        if(!$?){ Throw Write-Output "Something went wrong" }
+        Start-Sleep -Milliseconds 1500
+        createTextFile
+        if(!$?){ Throw Write-Output "Something went wrong" }
+        Start-Sleep -Milliseconds 1500
+        createdump
         if(!$?){ Throw Write-Output "Something went wrong" }
     }
 }
@@ -60,10 +64,6 @@ $dumpExist = Test-Path $Folder
 if(!$dumpExist) {
     setup
 }
-
-#Check 7z installion status
-. ./setup.ps1
-
 
 $getSize = (Get-ChildItem .\temp\ | Measure-Object -Property Length -Sum ).Sum / 1048576
 $sizeofDir = $getSize.ToString("###.##")
