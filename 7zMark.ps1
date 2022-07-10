@@ -8,7 +8,7 @@ param(
 if( "7z","zip" -NotContains $type ) { Throw "$type is not valid method" }
 if( "y","Y","n","N" -notcontains $setupclean ) { Throw "$setupclean is not valid input" }
 
-$Folder = "temp"
+$Folder = "$env:TEMP\temp"
 $method = "-t$($type)"
 Write-Output "Starting"
 
