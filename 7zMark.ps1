@@ -22,6 +22,25 @@ function get7z {
 
 get7z
 
+function createFolder {
+    New-Item -ItemType Directory $Folder -Force | out-null
+}
+
+function createTextFile {
+    New-Item -Path ./$Folder -Name "file.txt" -ItemType "file" -Value "The quick brown fox jumps over the lazy dog.`n" | out-null
+    for ($x=1; $x -le $lines; $x++) { 
+        Add-Content -Value 'The quick brown fox jumps over the lazy dog' -Path $Folder\file.txt
+        Write-Progress -Activity "File Creation" -Status "addeding content" -PercentComplete (($x/$lines)*100)
+    }
+}
+function createdump {
+    for ($k=1; $k -le $fileCount; $k++) {
+        Copy-Item $Folder\file.txt -Destination $Folder\file$($k).txt
+        Write-Progress -Activity "File copy" -Status "copying:" -PercentComplete (($k/$fileCount)*100)
+    }
+    if($?) { Write-Output "Setup Completed"} else { Write-Error -Message "Error" -ErrorId 1}
+}
+
 function startBenchMark {
     $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) .\$($Folder) | Out-Default } | select-object -Expand TotalMinutes 
     Write-Output "Time for completion $($7ztime.ToString("###.####")) Minutes"
