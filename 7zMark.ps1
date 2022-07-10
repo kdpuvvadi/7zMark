@@ -12,6 +12,16 @@ $Folder = "temp"
 $method = "-t$($type)"
 Write-Output "Starting"
 
+function get7z {
+    $is7z = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "7-Zip*"}
+    if($null -eq $is7z.VersionMajor ) {
+    Throw "7Zip is not installed on your PC"
+    exit 1
+    }
+}
+
+get7z
+
 function startBenchMark {
     $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) .\$($Folder) | Out-Default } | select-object -Expand TotalMinutes 
     Write-Output "Time for completion $($7ztime.ToString("###.####")) Minutes"
@@ -34,7 +44,7 @@ if(!$dumpExist) {
 
 #Check 7z installion status
 . ./setup.ps1
-get7z
+
 
 $getSize = (Get-ChildItem .\temp\ | Measure-Object -Property Length -Sum ).Sum / 1048576
 $sizeofDir = $getSize.ToString("###.##")
