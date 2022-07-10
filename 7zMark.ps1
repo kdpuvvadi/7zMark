@@ -1,6 +1,8 @@
 param(
         $type="7z",
-        $setupclean="n"
+        $setupclean="n",
+        $fileCount=5000, 
+        $lines=1000
     )
 
 if( "7z","zip" -NotContains $type ) { Throw "$type is not valid method" }
@@ -18,9 +20,9 @@ function startBenchMark {
 function setup {
     $dumpStart = Read-Host -Prompt "Test Dump is not present. Press Y/y to create?[y/n]"
     if ($dumpStart -match "[yY]") {
-        $NoLines = Read-Host -Prompt "Select Number of lines:"
-        $NoFiles = Read-Host -Prompt "Enter number of files:"
-        Invoke-Expression "./setup.ps1 -fileCount $NoFiles -lines $NoLines"
+        # $NoLines = Read-Host -Prompt "Select Number of lines:"
+        # $NoFiles = Read-Host -Prompt "Enter number of files:"
+        Invoke-Expression "./setup.ps1 -fileCount $fileCount -lines $lines"
         if(!$?){ Throw Write-Output "Something went wrong" }
     }
 }
