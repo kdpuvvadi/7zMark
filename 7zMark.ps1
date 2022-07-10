@@ -1,8 +1,8 @@
 param(
         $type="7z",
         $setupclean="n",
-        $fileCount=5000, 
-        $lines=1000
+        $fileCount=50000, 
+        $lines=100000
     )
 
 if( "7z","zip" -NotContains $type ) { Throw "$type is not valid method" }
@@ -42,7 +42,7 @@ function createdump {
 }
 
 function startBenchMark {
-    $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) .\$($Folder) | Out-Default } | select-object -Expand TotalSeconds 
+    $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) $($Folder) | Out-Default } | select-object -Expand TotalSeconds 
     Write-Output "Time for completion $($7ztime.ToString("####")) Seconds"
 }
 
@@ -68,7 +68,7 @@ if(!$dumpExist) {
 $getSize = (Get-ChildItem .\temp\ | Measure-Object -Property Length -Sum ).Sum / 1048576
 $sizeofDir = $getSize.ToString("###.##")
 
-$startBench = Read-Host -Prompt "Size of dump is $($sizeofDir)Mb, Start Benchmark ?[y/n]"
+$startBench = Read-Host -Prompt "Size of test data is $($sizeofDir)Mb, Start Benchmark ?[y/n]"
 if ($startBench -match "[yY]") {
     startBenchMark
     if(!$?){ Throw Write-Output "Something went wrong" }
