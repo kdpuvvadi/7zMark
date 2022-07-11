@@ -77,11 +77,11 @@ if(!$dumpExist) {
 $getSize = (Get-ChildItem $Folder | Measure-Object -Property Length -Sum ).Sum / 1048576
 $sizeofDir = $getSize.ToString("###.##")
 
-$startBench = Read-Host -Prompt "Size of test data is $($sizeofDir)Mb, Start Benchmark ?[y/n]"
+$startBench = Read-Host -Prompt "Size of test data is $($sizeofDir)Mb, Start Benchmark?[y/n]"
 if ($startBench -match "[yY]") {
     startBenchMark
     if(!$?){ Throw Write-Output "Something went wrong" }
-    }
+}
 
 if ( $setupclean -match "[yY]" ) { 
     Write-Output "Cleaning up"

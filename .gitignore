@@ -2,6 +2,7 @@
 !*.gitignore
 
 temp
+dump
 *.zip
 *.7z
 *.tmp
