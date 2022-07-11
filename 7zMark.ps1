@@ -27,7 +27,7 @@ function createFolder {
 }
 
 function createTextFile {
-    New-Item -Path ./$Folder -Name "file.txt" -ItemType "file" -Value "The quick brown fox jumps over the lazy dog.`n" | out-null
+    New-Item -Path $Folder -Name "file.txt" -ItemType "file" -Value "The quick brown fox jumps over the lazy dog.`n" | out-null
     for ($x=1; $x -le $lines; $x++) { 
         Add-Content -Value 'The quick brown fox jumps over the lazy dog' -Path $Folder\file.txt
         Write-Progress -Activity "File Creation" -Status "addeding content" -PercentComplete (($x/$lines)*100)
