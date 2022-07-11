@@ -10,6 +10,7 @@ if( "y","Y","n","N" -notcontains $setupclean ) { Throw "$setupclean is not valid
 
 $Folder = "dump"
 $method = "-t$($type)"
+$outfile=$($Folder)+'.'+$($type)
 Write-Output "Starting"
 
 function get7z {
@@ -43,7 +44,12 @@ function createdump {
 }
 
 function startBenchMark {
-    $7ztime = (Measure-Command { 7z a -mmt -mx9 $method test.$($type) $($Folder) }).TotalSeconds
+    $7ztime = (Measure-Command {
+        $OriginalProgPref = $ProgressPreference
+        $ProgressPreference = "SilentlyContinue"
+        7z a -mmt -mx9 $method $outfile $($Folder)
+        $ProgressPreference = $OriginalProgPref
+    }).TotalSeconds
     Write-Output "Time for completion $7ztime Seconds"
 }
 
@@ -79,8 +85,8 @@ if ($startBench -match "[yY]") {
 
 if ( $setupclean -match "[yY]" ) { 
     Write-Output "Cleaning up"
-    remove-item $($Folder).$($type) -Force -Confirm:$false
-    remove-item $Folder  -Force -Recurse -Confirm:$false
+    remove-item $outfile -Force -Confirm:$false
+    remove-item $Folder -Force -Recurse -Confirm:$false
 }
 else {
     exit 0
