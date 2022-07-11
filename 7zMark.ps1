@@ -68,7 +68,7 @@ if(!$dumpExist) {
     setup
 }
 
-$getSize = (Get-ChildItem .\temp\ | Measure-Object -Property Length -Sum ).Sum / 1048576
+$getSize = (Get-ChildItem $Folder | Measure-Object -Property Length -Sum ).Sum / 1048576
 $sizeofDir = $getSize.ToString("###.##")
 
 $startBench = Read-Host -Prompt "Size of test data is $($sizeofDir)Mb, Start Benchmark ?[y/n]"
