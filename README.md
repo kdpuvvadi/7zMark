@@ -30,3 +30,7 @@ With custom setup data
 ```pwsh
 Invoke-Expression ./7zMark.ps1 -lines 1000 -fileCount 1000 -type zip
 ```
+
+## Limitations
+
+This is process is highly depends on user storage device and single core performance of the cpu.
