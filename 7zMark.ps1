@@ -44,7 +44,7 @@ function createdump {
 
 function startBenchMark {
     $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) $($Folder) | Out-Default } | select-object -Expand TotalSeconds 
-    Write-Output "Time for completion $($7ztime.ToString("####")) Seconds"
+    Write-Output "Time for completion $7ztime Seconds"
 }
 
 function setup {
@@ -53,11 +53,13 @@ function setup {
         createFolder
         if(!$?){ Throw Write-Output "Something went wrong" }
         Start-Sleep -Milliseconds 1500
-        createTextFile
+        $timeForFile = (Measure-Command { createTextFile }).TotalSeconds
         if(!$?){ Throw Write-Output "Something went wrong" }
+        Write-Host "Time for File Creation: $timeForFile Seconds"
         Start-Sleep -Milliseconds 1500
-        createdump
+        $timeFordump = (Measure-Command { createdump }).TotalSeconds
         if(!$?){ Throw Write-Output "Something went wrong" }
+        Write-Host "Time for dump Creation: $timeFordump Seconds"
     }
 }
 
