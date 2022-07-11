@@ -2,7 +2,7 @@ param(
         $type="7z",
         $setupclean="n",
         $fileCount=20000, 
-        $lines=100000
+        $lines=10000
     )
 
 if( "7z","zip" -NotContains $type ) { Throw "$type is not valid method" }
@@ -28,17 +28,18 @@ function createFolder {
 
 function createTextFile {
     New-Item -Path $Folder -Name "file.txt" -ItemType "file" -Value "The quick brown fox jumps over the lazy dog.`n" | out-null
-    for ($x=1; $x -le $lines; $x++) { 
+    $totalLines = 0..[Int32]$lines
+    $totalLines | ForEach-Object {
         Add-Content -Value 'The quick brown fox jumps over the lazy dog' -Path $Folder\file.txt
-        Write-Progress -Activity "File Creation" -Status "addeding content" -PercentComplete (($x/$lines)*100)
+        Write-Progress -Activity "File Creation" -Status "addeding content.." -PercentComplete (($_/$lines)*100)
     }
 }
 function createdump {
-    for ($k=1; $k -le $fileCount; $k++) {
-        Copy-Item $Folder\file.txt -Destination $Folder\file$($k).txt
-        Write-Progress -Activity "File copy" -Status "copying:" -PercentComplete (($k/$fileCount)*100)
+    $totalFileCount=0..[int32]$filecount
+    $totalFileCount | ForEach-Object {
+        copy-item $Folder\file.txt -Destination $Folder\file$($_).txt
+        Write-Progress -Activity "File Copy" -Status "Copying.." -PercentComplete (($_/$filecount)*100)
     }
-    if($?) { Write-Output "Setup Completed"} else { Write-Error -Message "Error" -ErrorId 1}
 }
 
 function startBenchMark {
