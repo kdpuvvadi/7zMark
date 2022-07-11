@@ -8,7 +8,7 @@ param(
 if( "7z","zip" -NotContains $type ) { Throw "$type is not valid method" }
 if( "y","Y","n","N" -notcontains $setupclean ) { Throw "$setupclean is not valid input" }
 
-$Folder = "$env:TEMP\temp"
+$Folder = "dump"
 $method = "-t$($type)"
 Write-Output "Starting"
 
@@ -43,7 +43,7 @@ function createdump {
 }
 
 function startBenchMark {
-    $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) $($Folder) | Out-Default } | select-object -Expand TotalSeconds 
+    $7ztime = (Measure-Command { 7z a -mmt -mx9 $method test.$($type) $($Folder) }).TotalSeconds
     Write-Output "Time for completion $7ztime Seconds"
 }
 
@@ -79,8 +79,8 @@ if ($startBench -match "[yY]") {
 
 if ( $setupclean -match "[yY]" ) { 
     Write-Output "Cleaning up"
-    remove-item test.$($type) -Force -Confirm:$false
-    remove-item ./temp/  -Force -Recurse -Confirm:$false
+    remove-item $($Folder).$($type) -Force -Confirm:$false
+    remove-item $Folder  -Force -Recurse -Confirm:$false
 }
 else {
     exit 0
