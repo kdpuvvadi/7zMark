@@ -2,14 +2,15 @@ param(
         $type="7z",
         $setupclean="n",
         $fileCount=20000, 
-        $lines=100000
+        $lines=10000
     )
 
 if( "7z","zip" -NotContains $type ) { Throw "$type is not valid method" }
 if( "y","Y","n","N" -notcontains $setupclean ) { Throw "$setupclean is not valid input" }
 
-$Folder = "$env:TEMP\temp"
+$Folder = "dump"
 $method = "-t$($type)"
+$outfile=$($Folder)+'.'+$($type)
 Write-Output "Starting"
 
 function get7z {
@@ -27,23 +28,29 @@ function createFolder {
 }
 
 function createTextFile {
-    New-Item -Path ./$Folder -Name "file.txt" -ItemType "file" -Value "The quick brown fox jumps over the lazy dog.`n" | out-null
-    for ($x=1; $x -le $lines; $x++) { 
+    New-Item -Path $Folder -Name "file.txt" -ItemType "file" -Value "The quick brown fox jumps over the lazy dog.`n" | out-null
+    $totalLines = 0..[Int32]$lines
+    $totalLines | ForEach-Object {
         Add-Content -Value 'The quick brown fox jumps over the lazy dog' -Path $Folder\file.txt
-        Write-Progress -Activity "File Creation" -Status "addeding content" -PercentComplete (($x/$lines)*100)
+        Write-Progress -Activity "File Creation" -Status "addeding content.." -PercentComplete (($_/$lines)*100)
     }
 }
 function createdump {
-    for ($k=1; $k -le $fileCount; $k++) {
-        Copy-Item $Folder\file.txt -Destination $Folder\file$($k).txt
-        Write-Progress -Activity "File copy" -Status "copying:" -PercentComplete (($k/$fileCount)*100)
+    $totalFileCount=0..[int32]$filecount
+    $totalFileCount | ForEach-Object {
+        copy-item $Folder\file.txt -Destination $Folder\file$($_).txt
+        Write-Progress -Activity "File Copy" -Status "Copying.." -PercentComplete (($_/$filecount)*100)
     }
-    if($?) { Write-Output "Setup Completed"} else { Write-Error -Message "Error" -ErrorId 1}
 }
 
 function startBenchMark {
-    $7ztime = Measure-Command -Expression { 7z a -mmt -mx9 $method test.$($type) $($Folder) | Out-Default } | select-object -Expand TotalSeconds 
-    Write-Output "Time for completion $($7ztime.ToString("####")) Seconds"
+    $7ztime = (Measure-Command {
+        $OriginalProgPref = $ProgressPreference
+        $ProgressPreference = "SilentlyContinue"
+        7z a -mmt -mx9 $method $outfile $($Folder)
+        $ProgressPreference = $OriginalProgPref
+    }).TotalSeconds
+    Write-Output "Time for completion $7ztime Seconds"
 }
 
 function setup {
@@ -52,11 +59,13 @@ function setup {
         createFolder
         if(!$?){ Throw Write-Output "Something went wrong" }
         Start-Sleep -Milliseconds 1500
-        createTextFile
+        $timeForFile = (Measure-Command { createTextFile }).TotalSeconds
         if(!$?){ Throw Write-Output "Something went wrong" }
+        Write-Host "Time for File Creation: $timeForFile Seconds"
         Start-Sleep -Milliseconds 1500
-        createdump
+        $timeFordump = (Measure-Command { createdump }).TotalSeconds
         if(!$?){ Throw Write-Output "Something went wrong" }
+        Write-Host "Time for dump Creation: $timeFordump Seconds"
     }
 }
 
@@ -65,19 +74,19 @@ if(!$dumpExist) {
     setup
 }
 
-$getSize = (Get-ChildItem .\temp\ | Measure-Object -Property Length -Sum ).Sum / 1048576
+$getSize = (Get-ChildItem $Folder | Measure-Object -Property Length -Sum ).Sum / 1048576
 $sizeofDir = $getSize.ToString("###.##")
 
-$startBench = Read-Host -Prompt "Size of test data is $($sizeofDir)Mb, Start Benchmark ?[y/n]"
+$startBench = Read-Host -Prompt "Size of test data is $($sizeofDir)Mb, Start Benchmark?[y/n]"
 if ($startBench -match "[yY]") {
     startBenchMark
     if(!$?){ Throw Write-Output "Something went wrong" }
-    }
+}
 
 if ( $setupclean -match "[yY]" ) { 
     Write-Output "Cleaning up"
-    remove-item test.$($type) -Force -Confirm:$false
-    remove-item ./temp/  -Force -Recurse -Confirm:$false
+    remove-item $outfile -Force -Confirm:$false
+    remove-item $Folder -Force -Recurse -Confirm:$false
 }
 else {
     exit 0
