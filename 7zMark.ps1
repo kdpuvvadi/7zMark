@@ -50,7 +50,34 @@ function startBenchMark {
         7z a -mmt -mx9 $method $outfile $($Folder)
         $ProgressPreference = $OriginalProgPref
     }).TotalSeconds
-    Write-Output "Time for completion $7ztime Seconds"
+    Write-Host "Time for completion $7ztime Seconds"
+}
+
+function cleanOut { 
+    # Deleting output archive if exists.
+    if($(Test-Path $outfile)){
+        Write-Host -NoNewline "Deleting $outfile" 
+        remove-item $outfile -Force -Confirm:$false
+        if($?){ Write-Host " Done" -ForegroundColor Green}
+    }
+    else {
+        Write-Host -NoNewline "$outfile not found. "
+        Write-Host "Exiting" -ForegroundColor Red
+        exit 0
+    }
+}
+function cleanDump {
+    # Delete dump folder if exists
+    if($(Test-Path $Folder)){
+        Write-Host -NoNewline "Deleting $Folder" 
+        remove-item $Folder -Force -Recurse -Confirm:$false
+        if($?){ Write-Host " Done" -ForegroundColor Green }
+    }  
+    else {
+        Write-Host -NoNewline "$Folder not found."
+        Write-Host "Exiting" -ForegroundColor Red
+        exit 0
+    }
 }
 
 function setup {
@@ -66,6 +93,11 @@ function setup {
         $timeFordump = (Measure-Command { createdump }).TotalSeconds
         if(!$?){ Throw Write-Output "Something went wrong" }
         Write-Host "Time for dump Creation: $timeFordump Seconds"
+    }
+    elseif ($setupclean -match "[yY]") {
+        Write-Output "Cleaning up"
+        cleanOut
+        cleanDump
     }
     else {
         Write-Host "Nothing to do. Exiting"
@@ -89,26 +121,8 @@ if ($startBench -match "[yY]") {
 
 if ( $setupclean -match "[yY]" ) { 
     Write-Output "Cleaning up"
-    # Deleting output archive if exists.
-    if($(Test-Path $outfile)){
-        Write-Host  -NoNewline "Deleting $outfile " 
-        remove-item $outfile -Force -Confirm:$false
-        if($?){ Write-Output " Done" }
-    }
-    else {
-        Write-Host "Nothing to do. Exiting"
-        exit 0
-    }
-    # Delete dump folder if exists
-    if($(Test-Path $Folder)){
-        Write-Host  -NoNewline "Deleting $Folder " 
-        remove-item $Folder -Force -Recurse -Confirm:$false
-        if($?){ Write-Output " Done" }
-    }  
-    else {
-        Write-Host "Nothing to do. Exiting"
-        exit 0
-    }
+    cleanDump
+    cleanOut
 }
 else {
     exit 0
