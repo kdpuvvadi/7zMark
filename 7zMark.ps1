@@ -89,8 +89,26 @@ if ($startBench -match "[yY]") {
 
 if ( $setupclean -match "[yY]" ) { 
     Write-Output "Cleaning up"
-    remove-item $outfile -Force -Confirm:$false
-    remove-item $Folder -Force -Recurse -Confirm:$false
+    # Deleting output archive if exists.
+    if($(Test-Path $outfile)){
+        Write-Host  -NoNewline "Deleting $outfile " 
+        remove-item $outfile -Force -Confirm:$false
+        if($?){ Write-Output " Done" }
+    }
+    else {
+        Write-Host "Nothing to do. Exiting"
+        exit 0
+    }
+    # Delete dump folder if exists
+    if($(Test-Path $Folder)){
+        Write-Host  -NoNewline "Deleting $Folder " 
+        remove-item $Folder -Force -Recurse -Confirm:$false
+        if($?){ Write-Output " Done" }
+    }  
+    else {
+        Write-Host "Nothing to do. Exiting"
+        exit 0
+    }
 }
 else {
     exit 0
