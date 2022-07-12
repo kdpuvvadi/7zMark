@@ -67,6 +67,10 @@ function setup {
         if(!$?){ Throw Write-Output "Something went wrong" }
         Write-Host "Time for dump Creation: $timeFordump Seconds"
     }
+    else {
+        Write-Host "Nothing to do. Exiting"
+        exit 0
+    }
 }
 
 $dumpExist = Test-Path $Folder
