@@ -14,10 +14,23 @@ $outfile=$($Folder)+'.'+$($type)
 Write-Output "Starting"
 
 function get7z {
-    $is7z = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "7-Zip*"}
-    if($null -eq $is7z.VersionMajor ) {
-    Throw "7Zip is not installed on your PC"
-    exit 1
+
+    if (($PSVersionTable.PSEdition -eq "Desktop") -or
+    ($PSVersionTable.Platform -eq "Win32NT")) { 
+        Write-Host "Running on Windows Machine"
+        $is7z = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "7-Zip*"}
+        if($null -eq $is7z.VersionMajor ) {
+            Throw "7Zip is not installed on your PC"
+            exit 1
+        }
+    } 
+    elseif ($PSVersionTable.Platform -eq "Unix") { 
+        Write-Host "Running on Linux "
+        which 7z  > /dev/null 2>&1;
+        if(!$?){ 
+            Throw "7Zip is not installed on your PC"
+            exit 1
+        }
     }
 }
 
